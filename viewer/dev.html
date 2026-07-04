@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>bs viewer dev</title>
+<style>html,body{margin:0;height:100%;background:#20242a;overflow:hidden}#host{position:fixed;inset:0}</style></head>
+<body>
+<div id="host"></div>
+<script type="module">
+import { createViewer } from './bs-viewer.js';
+const q = new URLSearchParams(location.search);
+const src = q.get('src') || '../model/wolf.glb';
+await createViewer(document.getElementById('host'), { src, variant: q.get('variant') || undefined });
+window.__ready = true;
+</script>
+</body>
+</html>
