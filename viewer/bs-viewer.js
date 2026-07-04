@@ -98,6 +98,17 @@ export async function createViewer(host, opts = {}) {
   playB.onclick = () => { paused = !paused; if (actions[cur]) actions[cur].paused = paused; playB.textContent = paused ? '▶' : '❚❚'; };
   show(0);   // idle first (animations[0])
 
+  // --- skin dropdown (top-left), only if the model bundles multiple skins ---
+  const variantNames = (gltf.parser.json.extensions?.KHR_materials_variants?.variants || []).map((v) => v.name);
+  let variantSel = null;
+  if (variantNames.length > 1) {
+    variantSel = el('select', 'position:absolute;top:6px;left:6px;z-index:3;cursor:pointer;background:rgba(18,20,26,.82);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:4px 7px;font:600 12px sans-serif');
+    variantNames.forEach((n, i) => { const o = document.createElement('option'); o.value = String(i); o.textContent = `Skin ${i + 1}`; variantSel.appendChild(o); });
+    variantSel.value = String(/^\d+$/.test(String(opts.variant)) ? Number(opts.variant) : Math.max(0, variantNames.indexOf(opts.variant)));
+    variantSel.onchange = () => selectVariant(gltf, model, variantSel.value);
+    host.appendChild(variantSel);
+  }
+
   // brief drag/zoom hint above the controls
   const hint = el('div', 'position:absolute;left:0;right:0;bottom:36px;text-align:center;pointer-events:none;color:#fff;font:600 11px sans-serif;text-shadow:0 1px 3px #000;transition:opacity .7s',
     matchMedia('(pointer:coarse)').matches ? 'drag to rotate · pinch to zoom' : 'drag to rotate · scroll to zoom');
@@ -121,5 +132,5 @@ export async function createViewer(host, opts = {}) {
     renderer.render(scene, camera);
   })();
 
-  return { stop() { running = false; controls.dispose(); renderer.dispose(); renderer.domElement.remove(); bar.remove(); hint.remove(); } };
+  return { stop() { running = false; controls.dispose(); renderer.dispose(); renderer.domElement.remove(); bar.remove(); hint.remove(); variantSel && variantSel.remove(); } };
 }
