@@ -33,18 +33,9 @@ if (src && img) {                                      // URL of the uploaded .g
     const { width, height } = img.getBoundingClientRect();
     host = document.createElement('div');
     host.style.cssText = `position:relative;width:${Math.round(width)}px;height:${Math.round(height)}px`;
-    host.appendChild(hint());
     slot.insertBefore(host, btn);
     media.style.display = 'none';
     btn.textContent = '2D';
-    viewer = await createViewer(host, { src, variant });
+    viewer = await createViewer(host, { src, variant });   // viewer adds the hint + animation controls
   };
-}
-
-function hint() {
-  const el = document.createElement('div');
-  el.textContent = matchMedia('(pointer:coarse)').matches ? 'drag to rotate · pinch to zoom' : 'drag to rotate · scroll to zoom';
-  el.style.cssText = 'position:absolute;left:0;right:0;bottom:6px;text-align:center;pointer-events:none;'
-    + 'color:#fff;font:600 11px sans-serif;text-shadow:0 1px 3px #000';
-  return el;
 }
